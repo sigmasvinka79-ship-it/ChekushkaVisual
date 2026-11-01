@@ -5,7 +5,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: unzip -o lumen-visuals-1.21.11.zip
+      - name: Unpack
+        run: |
+          ls -la
+          mkdir -p proj
+          unzip -o ./*.zip -d proj
+          D=$(dirname "$(find proj -name build.gradle | head -n 1)")
+          echo "PROJ=$D" >> "$GITHUB_ENV"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -13,8 +19,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 9.2.1
-      - run: cd lumen-visuals && gradle build --no-daemon
+      - name: Build
+        run: cd "$PROJ" && gradle build --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: lumen-jar
-          path: lumen-visuals/build/libs/*.jar
+          path: ${{ env.PROJ }}/build/libs/*.jar
