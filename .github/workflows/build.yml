@@ -7,8 +7,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Unpack
         run: |
+          ls -la
+          Z=$(ls -S ./*.zip | head -n 1)
+          echo "Using: $Z"
           mkdir -p proj
-          unzip -o ./*.zip -d proj
+          unzip -o "$Z" -d proj
           D=$(dirname "$(find proj -name build.gradle | head -n 1)")
           echo "PROJ=$D" >> "$GITHUB_ENV"
           grep -rl "import net.minecraft.Util;" "$D/src" | xargs -r sed -i 's/import net.minecraft.Util;/import net.minecraft.util.Util;/'
